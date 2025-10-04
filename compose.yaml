@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: mhd0/react-frontend:latest
+    container_name: react-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:5001/api
+    networks:
+      - backend-net
+    restart: unless-stopped
+
+  backend:
+    image: mhd0/express-backend:latest
+    container_name: express-api
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+      - MONGODB_URI=mongodb://mongo:27017/smartphoneDB
+    depends_on:
+      - mongo
+    networks:
+      - backend-net
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      - MONGO_INITDB_DATABASE=smartphoneDB
+    networks:
+      - backend-net
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+
+networks:
+  backend-net:
+    driver: bridge
