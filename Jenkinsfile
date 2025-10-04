@@ -28,7 +28,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Aychana/express_mongo_react'
+                git branch: 'main',
+                    credentialsId: 'github-creds',
+                    url: 'https://github.com/Aychana/express_mongo_react'
             }
         }
 
@@ -123,14 +125,14 @@ pipeline {
             emailext(
                 subject: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Pipeline réussi\nDétails : ${env.BUILD_URL}",
-                to: "mohamedndoye07@gmail.com"
+                to: "aychana07@gmail.com"
             )
         }
         failure {
             emailext(
                 subject: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Le pipeline a échoué\nDétails : ${env.BUILD_URL}",
-                to: "mohamedndoye07@gmail.com"
+                to: "aychana07@gmail.com"
             )
         }
     }
