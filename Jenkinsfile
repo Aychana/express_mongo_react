@@ -30,7 +30,7 @@ pipeline {
             steps {
                 git branch: 'main',
                     credentialsId: 'github-creds',
-                    url: 'https://github.com/Aychana/express_mongo_react'
+                    url: 'https://github.com/Aychana/express_mongo_react.git'
             }
         }
 
@@ -91,18 +91,18 @@ pipeline {
         stage('Check Docker & Compose') {
             steps {
                 sh 'docker --version'
-                sh 'docker-compose --version || echo "docker-compose non trouvé"'
+                sh 'docker compose --version || echo "docker compose non trouvé"'
             }
         }
 
         stage('Deploy (compose.yaml)') {
             steps {
                 dir('.') {  
-                    sh 'docker-compose -f compose.yaml down || true'
-                    sh 'docker-compose -f compose.yaml pull'
-                    sh 'docker-compose -f compose.yaml up -d'
-                    sh 'docker-compose -f compose.yaml ps'
-                    sh 'docker-compose -f compose.yaml logs --tail=50'
+                    sh 'docker compose -f compose.yaml down || true'
+                    sh 'docker compose -f compose.yaml pull'
+                    sh 'docker compose -f compose.yaml up -d'
+                    sh 'docker compose -f compose.yaml ps'
+                    sh 'docker compose -f compose.yaml logs --tail=50'
                 }
             }
         }
