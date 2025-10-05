@@ -1,4 +1,4 @@
-// charger la base de donée
+// charger la base de donNée
 db = db.getSiblingDB('smartphoneDB');
 
 db.smartphones.insertMany([
