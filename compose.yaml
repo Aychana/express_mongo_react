@@ -3,7 +3,7 @@ version: "3.9"
 services:
   frontend:
     image: aychana/react-frontend:latest
-    container_name: react-frontend
+    # container_name: react-frontend
     ports:
       - "5173:5173"
     depends_on:
@@ -16,7 +16,7 @@ services:
 
   backend:
     image: aychana/express-backend:latest
-    container_name: express-api
+    # container_name: express-api
     ports:
       - "5001:5001"
     environment:
