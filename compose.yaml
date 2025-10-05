@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   frontend:
-    image: mhd0/react-frontend:latest
+    image: aychana/react-frontend:latest
     container_name: react-frontend
     ports:
       - "5173:5173"
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   backend:
-    image: mhd0/express-backend:latest
+    image: aychana/express-backend:latest
     container_name: express-api
     ports:
       - "5001:5001"
