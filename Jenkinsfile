@@ -104,7 +104,7 @@ pipeline {
         stage('Deploy (compose.yaml)') {
             steps {
                 dir('.') {
-                    // ⚠️ Important : si tu gardes des container_name fixes dans compose.yaml,
+                    // Important : si tu gardes des container_name fixes dans compose.yaml,
                     // il faut supprimer les anciens conteneurs AVANT de relancer
                     sh 'docker rm -f mongo express-api react-frontend || true'
 
