@@ -41,30 +41,35 @@ const SmartphoneForm = ({ smartphone, onSubmit, onCancel }) => {
     }
   }, [smartphone]);
 
+  function parseInputValue(type, value, checked) {
+    if (type === 'checkbox') return checked;
+    if (type === 'number') return Number(value);
+    if (type === 'date') return value; // explicite, même si identique au cas par défaut
+    return value;
+  }
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+    const newValue = parseInputValue(type, value, checked);
+
     if (name.includes('.')) {
+      // Cas des champs imbriqués (ex: "parent.child")
       const [parent, child] = name.split('.');
       setFormData(prev => ({
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: type === 'number' ? Number(value) : 
-                   type === 'checkbox' ? checked : value
+          [child]: newValue
         }
       }));
     } else {
-      const newValue = type === 'checkbox' ? checked : 
-                      type === 'number' ? Number(value) : 
-                      value;
-      
+      // Cas des champs simples
       setFormData(prev => ({
         ...prev,
         [name]: newValue
       }));
 
-      // Mettre à jour l'aperçu de l'image
+      // Gestion spéciale pour l'image (aperçu)
       if (name === 'image') {
         setImagePreview(value);
       }
