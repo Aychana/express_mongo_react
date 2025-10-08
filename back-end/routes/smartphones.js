@@ -21,12 +21,12 @@ router.get('/', async (req, res) => {
       if (maxPrix) filter.prix.$lte = Number(maxPrix);
     }
     
-    const smartphones = await Smartphone.find(filter)
+    const smartphones = await Smartphone.find(filter).exec()
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });
     
-    const total = await Smartphone.countDocuments(filter);
+    const total = await Smartphone.countDocuments(filter).exec();
     
     res.json({
       smartphones,
@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
 // GET - Récupérer un smartphone par ID
 router.get('/:id', async (req, res) => {
   try {
-    const smartphone = await Smartphone.findById(req.params.id);
+    const smartphone = await Smartphone.findById(req.params.id).exec();
     
     if (!smartphone) {
       return res.status(404).json({ message: 'Smartphone non trouvé' });
@@ -72,7 +72,7 @@ router.put('/:id', async (req, res) => {
       req.params.id,
       req.body,
       { new: true, runValidators: true }
-    );
+    ).exec();
     
     if (!smartphone) {
       return res.status(404).json({ message: 'Smartphone non trouvé' });
@@ -87,7 +87,7 @@ router.put('/:id', async (req, res) => {
 // DELETE - Supprimer un smartphone
 router.delete('/:id', async (req, res) => {
   try {
-    const smartphone = await Smartphone.findByIdAndDelete(req.params.id);
+    const smartphone = await Smartphone.findByIdAndDelete(req.params.id).exec();
     
     if (!smartphone) {
       return res.status(404).json({ message: 'Smartphone non trouvé' });
@@ -108,7 +108,7 @@ router.get('/search/:term', async (req, res) => {
         { marque: new RegExp(term, 'i') },
         { modele: new RegExp(term, 'i') }
       ]
-    });
+    }).exec();
     
     res.json(smartphones);
   } catch (error) {
