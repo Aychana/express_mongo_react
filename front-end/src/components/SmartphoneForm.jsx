@@ -57,7 +57,7 @@ const SmartphoneForm = ({ smartphone, onSubmit, onCancel }) => {
     } else {
       const newValue = type === 'checkbox' ? checked : 
                       type === 'number' ? Number(value) : 
-                      type === 'date' ? value : value;
+                      value;
       
       setFormData(prev => ({
         ...prev,

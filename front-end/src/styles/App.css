@@ -142,6 +142,7 @@ body {
   font-size: 1.5rem;
   font-weight: bold;
   color: #27ae60;
+  text-align: right;
 }
 
 .smartphone-details {
@@ -338,10 +339,6 @@ body {
   font-size: 12px;
 }
 
-/* Styles des prix */
-.smartphone-price {
-  text-align: right;
-}
 
 .price-promotional {
   font-size: 1.5rem;

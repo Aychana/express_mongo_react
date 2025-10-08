@@ -19,7 +19,7 @@ exports.addSmartphone = async (req, res) => {
 // Récupérer tous les smartphones
 exports.getAllSmartphones = async (req, res) => {
     try {
-        const smartphones = await Smartphone.find(); // Tous les documents
+        const smartphones = await Smartphone.find().exec(); // Tous les documents
         res.json(smartphones);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -29,7 +29,7 @@ exports.getAllSmartphones = async (req, res) => {
 // Récupérer un smartphone par ID
 exports.getSmartphoneById = async (req, res) => {
     try {
-        const smartphone = await Smartphone.findOne({ id: req.params.id });
+        const smartphone = await Smartphone.findOne({ id: req.params.id }).exec();
         if (!smartphone) {
             return res.status(404).json({ message: 'Smartphone non trouvé' });
         }
@@ -46,7 +46,7 @@ exports.updateSmartphone = async (req, res) => {
             { id: req.params.id },    // Trouver par ID
             req.body,                 // Nouveau contenu
             { new: true }             
-        );
+        ).exec();
 
         if (!updatedSmartphone) {
             return res.status(404).json({ message: 'Smartphone non trouvé' });
@@ -60,7 +60,7 @@ exports.updateSmartphone = async (req, res) => {
 // Supprimer un smartphone
 exports.deleteSmartphone = async (req, res) => {
     try {
-        const deletedSmartphone = await Smartphone.findOneAndDelete({ id: req.params.id });
+        const deletedSmartphone = await Smartphone.findOneAndDelete({ id: req.params.id }).exec();
         if (!deletedSmartphone) {
             return res.status(404).json({ message: 'Smartphone non trouvé' });
         }
