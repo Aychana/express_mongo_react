@@ -3,7 +3,6 @@ import React from 'react';
 const SmartphoneCard = ({ smartphone, onEdit, onDelete }) => {
   const prixReel = smartphone.prixPromotionnel || smartphone.prix;
   const enPromotion = smartphone.enPromotion && smartphone.promotionPourcentage > 0;
-  // const test = "";
 
   return (
     <div className="smartphone-card">
