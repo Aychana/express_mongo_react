@@ -8,7 +8,7 @@ export default defineConfig({
     host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://backend:5000',
+        target: 'http://localhost:5001', // pour dev local
         changeOrigin: true,
         secure: false
       }

@@ -123,48 +123,56 @@ pipeline {
             }
         }
 
-        stage('Check Docker & Compose') {
+        // stage('Check Docker & Compose') {
+        //     steps {
+        //         // Vérifie que Docker et Docker Compose sont installés
+        //         sh 'docker --version'
+        //         sh 'docker compose --version || echo "docker compose non trouvé"'
+        //     }
+        // }
+
+        stage('Deploy to Kubernetes') {
             steps {
-                // Vérifie que Docker et Docker Compose sont installés
-                sh 'docker --version'
-                sh 'docker compose --version || echo "docker compose non trouvé"'
-            }
-        }
-
-        stage('Deploy (compose.yaml)') {
-            steps {
-                dir('.') {
-                    // Important : si tu gardes des container_name fixes dans compose.yaml,
-                    // il faut supprimer les anciens conteneurs AVANT de relancer
-                    sh 'docker rm -f mongo express-api react-frontend || true'
-
-                    // Arrête et supprime les conteneurs du projet courant
-                    sh 'docker compose -f compose.yaml down || true'
-
-                    // Récupère les dernières images
-                    sh 'docker compose -f compose.yaml pull'
-
-                    // Redéploie les conteneurs
-                    sh 'docker compose -f compose.yaml up -d'
-
-                    // Vérifie l’état des conteneurs
-                    sh 'docker compose -f compose.yaml ps'
-
-                    // Affiche les 50 dernières lignes de logs
-                    sh 'docker compose -f compose.yaml logs --tail=50'
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                sh 'kubectl --kubeconfig=$KUBECONFIG apply -f k8s/ -n fil-rouge'
                 }
             }
         }
+
+        // stage('Deploy (compose.yaml)') {
+        //     steps {
+        //         dir('.') {
+        //             // Important : si tu gardes des container_name fixes dans compose.yaml,
+        //             // il faut supprimer les anciens conteneurs AVANT de relancer
+        //             sh 'docker rm -f mongo express-api react-frontend || true'
+
+        //             // Arrête et supprime les conteneurs du projet courant
+        //             sh 'docker compose -f compose.yaml down || true'
+
+        //             // Récupère les dernières images
+        //             sh 'docker compose -f compose.yaml pull'
+
+        //             // Redéploie les conteneurs
+        //             sh 'docker compose -f compose.yaml up -d'
+
+        //             // Vérifie l’état des conteneurs
+        //             sh 'docker compose -f compose.yaml ps'
+
+        //             // Affiche les 50 dernières lignes de logs
+        //             sh 'docker compose -f compose.yaml logs --tail=50'
+        //         }
+        //     }
+        // }
 
         stage('Smoke Test') {
             steps {
                 // Vérifie que les services répondent bien sur les bons ports
                 sh '''
-                    echo " Vérification Frontend (port 5173)..."
-                    curl -f http://localhost:5173 || echo "Frontend unreachable"
+                    echo " Vérification Frontend via Ingress..."
+                    curl -f http://fil-rouge.local || echo "Frontend unreachable"
 
-                    echo " Vérification Backend (port 5001)..."
-                    curl -f http://localhost:5001/api || echo "Backend unreachable"
+                    echo " Vérification Backend via Ingress..."
+                    curl -f http://fil-rouge.local/api/health || echo "Backend unreachable"
                 '''
             }
         }
