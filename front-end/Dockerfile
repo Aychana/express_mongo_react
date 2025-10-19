@@ -1,14 +1,11 @@
-FROM node:22.18.0-alpine
-
+# Étape 1 : Build
+FROM node:22.18.0-alpine AS build
 WORKDIR /app
 
-# Copier les fichiers package d'abord
 COPY package*.json ./
-
-# Installer toutes les dépendances (dont devDependencies)
 RUN npm install
+COPY . .
 
-# Injecter l’URL de l’API au build
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
@@ -18,6 +15,7 @@ RUN npm run build
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
+# Ici on copie depuis l’alias "build"
 COPY --from=build /app/dist .
 
 EXPOSE 80

@@ -98,10 +98,8 @@ pipeline {
                     // Construit les images Docker pour le frontend et le backend
                     // Build du frontend avec l’URL de l’API
                     sh """
-                        docker build \
-                            -t $DOCKER_HUB_USER/$FRONT_IMAGE:latest \
-                            --build-arg VITE_API_URL=http://fil-rouge.local/api \
-                            ./front-end
+                        docker build -t aychana/react-frontend:latest ./front-end \
+                        --build-arg VITE_API_URL=http://fil-rouge.local/api
 """
                     // Build du backend
                     sh "docker build -t $DOCKER_HUB_USER/$BACK_IMAGE:latest ./back-end"
