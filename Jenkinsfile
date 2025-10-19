@@ -96,7 +96,14 @@ pipeline {
             steps {
                 script {
                     // Construit les images Docker pour le frontend et le backend
-                    sh "docker build -t $DOCKER_HUB_USER/$FRONT_IMAGE:latest ./front-end"
+                    // Build du frontend avec l’URL de l’API
+                    sh """
+                        docker build \
+                            -t $DOCKER_HUB_USER/$FRONT_IMAGE:latest \
+                            --build-arg VITE_API_URL=http://fil-rouge.local/api \
+                            ./front-end
+"""
+                    // Build du backend
                     sh "docker build -t $DOCKER_HUB_USER/$BACK_IMAGE:latest ./back-end"
                 }
             }

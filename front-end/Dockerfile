@@ -4,16 +4,21 @@ WORKDIR /app
 
 # Copier les fichiers package d'abord
 COPY package*.json ./
-COPY vite.config.js ./
 
 # Installer toutes les dépendances (dont devDependencies)
 RUN npm install
 
-# Copier le code source
-COPY . .
+# Injecter l’URL de l’API au build
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 
-# Exposer le port que Vite utilise (généralement 5173 ou 3000)
-EXPOSE 5173
+RUN npm run build
 
-# Lancer en mode développement
-CMD ["npm", "run", "dev", "--", "--host=0.0.0.0"]
+# Étape 2 : Serveur Nginx
+FROM nginx:alpine
+WORKDIR /usr/share/nginx/html
+
+COPY --from=build /app/dist .
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
