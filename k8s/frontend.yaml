@@ -18,17 +18,33 @@ spec:
         image: aychana/react-frontend:latest
         ports:
         - containerPort: 3000
+      
 
 ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: frontend
+#   namespace: fil-rouge
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: frontend
+#   ports:
+#   - port: 80
+#     targetPort: 3000 
+
 apiVersion: v1
 kind: Service
 metadata:
   name: frontend
   namespace: fil-rouge
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: frontend
   ports:
   - port: 80
-    targetPort: 3000 
+    targetPort: 3000
+    nodePort: 32080
+

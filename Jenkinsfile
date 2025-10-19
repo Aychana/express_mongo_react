@@ -98,9 +98,12 @@ pipeline {
                     // Construit les images Docker pour le frontend et le backend
                     // Build du frontend avec l’URL de l’API
                     sh """
-                        docker build -t aychana/react-frontend:latest ./front-end \
-                        --build-arg VITE_API_URL=http://fil-rouge.local/api
-"""
+                        docker build \
+                        -t $DOCKER_HUB_USER/$FRONT_IMAGE:latest \
+                        ./front-end \
+                        --build-arg VITE_API_URL=http://192.168.58.2:32081/api
+
+                    """
                     // Build du backend
                     sh "docker build -t $DOCKER_HUB_USER/$BACK_IMAGE:latest ./back-end"
                 }
@@ -173,11 +176,11 @@ pipeline {
             steps {
                 // Vérifie que les services répondent bien sur les bons ports
                 sh '''
-                    echo " Vérification Frontend via Ingress..."
-                    curl -f http://fil-rouge.local || echo "Frontend unreachable"
+                    echo " Vérification Frontend via NodePort..."
+                    curl -f http://192.168.58.2:32080 || echo "Frontend unreachable"
 
-                    echo " Vérification Backend via Ingress..."
-                    curl -f http://fil-rouge.local/api/health || echo "Backend unreachable"
+                    echo " Vérification Backend via NodePort..."
+                    curl -f http://192.168.58.2:32081/api/health || echo "Backend unreachable"
                 '''
             }
         }
