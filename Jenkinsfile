@@ -143,6 +143,9 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                 sh 'kubectl --kubeconfig=$KUBECONFIG apply -f k8s/ -n fil-rouge'
+                sh 'kubectl --kubeconfig=$KUBECONFIG rollout restart deploy frontend -n fil-rouge'
+                sh 'kubectl --kubeconfig=$KUBECONFIG rollout restart deploy backend -n fil-rouge'
+
                 }
             }
         }
