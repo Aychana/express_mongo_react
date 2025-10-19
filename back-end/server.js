@@ -45,10 +45,10 @@ const connectWithRetry = () => {
   mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
       console.log('✅ Connecté à MongoDB');
-      app.listen(PORT, () => {
+      app.listen(PORT, '0.0.0.0', () => {
         console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-        console.log(`📍 Environnement: ${process.env.NODE_ENV}`);
       });
+
     })
     .catch(err => {
       console.error('❌ Erreur de connexion à MongoDB:', err.message);
