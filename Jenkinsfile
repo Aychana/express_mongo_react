@@ -101,7 +101,7 @@ pipeline {
                         docker build \
                         -t $DOCKER_HUB_USER/$FRONT_IMAGE:latest \
                         ./front-end \
-                        --build-arg VITE_API_URL=http://192.168.58.2:32081/api
+                        --build-arg VITE_API_URL=http://192.168.49.2:32081/api
 
                     """
                     // Build du backend
@@ -186,10 +186,10 @@ pipeline {
                 // Vérifie que les services répondent bien sur les bons ports
                 sh '''
                     echo " Vérification Frontend via NodePort..."
-                    curl -f http://192.168.58.2:32080 || echo "Frontend unreachable"
+                    curl -f http://192.168.49.2:32080 || echo "Frontend unreachable"
 
                     echo " Vérification Backend via NodePort..."
-                    curl -f http://192.168.58.2:32081/api/health || echo "Backend unreachable"
+                    curl -f http://192.168.49.2:32081/api/health || echo "Backend unreachable"
                 '''
             }
         }
