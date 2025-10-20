@@ -141,11 +141,17 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
+                // Charge les identifiants kubeconfig stockés dans Jenkins
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                sh 'kubectl --kubeconfig=$KUBECONFIG apply -f k8s/ -n fil-rouge'
-                sh 'kubectl --kubeconfig=$KUBECONFIG rollout restart deploy frontend -n fil-rouge'
-                sh 'kubectl --kubeconfig=$KUBECONFIG rollout restart deploy backend -n fil-rouge'
 
+                    // Applique tous les fichiers YAML dans le dossier k8s/ pour déployer les ressources
+                    sh 'kubectl --kubeconfig=$KUBECONFIG apply -f k8s/ -n fil-rouge'
+
+                    // Redémarre le déploiement frontend pour prendre en compte la dernière image (rolling restart)
+                    sh 'kubectl --kubeconfig=$KUBECONFIG rollout restart deploy frontend -n fil-rouge'
+
+                    // Redémarre le déploiement backend pour prendre en compte la dernière image
+                    sh 'kubectl --kubeconfig=$KUBECONFIG rollout restart deploy backend -n fil-rouge'
                 }
             }
         }

@@ -1,14 +1,15 @@
+#  Ingress : permet d'accéder au frontend et backend via un nom de domaine local
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: fil-rouge-ingress
   namespace: fil-rouge
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: nginx  # utilisation de NGINX Ingress Controller
 spec:
   ingressClassName: nginx
   rules:
-  - host: fil-rouge.local
+  - host: fil-rouge.local  # nom de domaine local à ajouter dans /etc/hosts
     http:
       paths:
       - path: /

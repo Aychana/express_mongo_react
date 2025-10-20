@@ -1,3 +1,4 @@
+# Secret contenant la chaîne de connexion à MongoDB
 apiVersion: v1
 kind: Secret
 metadata:
@@ -7,13 +8,14 @@ type: Opaque
 stringData:
   MONGO_URI: "mongodb://root:changeme@mongo.fil-rouge.svc.cluster.local:27017/?authSource=admin"
 ---
+#  Déploiement du backend (API)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
   namespace: fil-rouge
 spec:
-  replicas: 2
+  replicas: 2 # deux pods backend pour la haute disponibilité
   selector:
     matchLabels:
       app: backend
@@ -29,31 +31,19 @@ spec:
         - containerPort: 5001
         envFrom:
         - secretRef:
-            name: backend-secret
+            name: backend-secret  # injection de MONGO_URI
 ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: backend
-#   namespace: fil-rouge
-# spec:
-#   type: ClusterIP
-#   selector:
-#     app: backend
-#   ports:
-#   - port: 5001
-#     targetPort: 5001
-
+#  Service exposant le backend
 apiVersion: v1
 kind: Service
 metadata:
   name: backend
   namespace: fil-rouge
 spec:
-  type: NodePort
+  type: NodePort  # permet d'accéder au backend depuis l'extérieur du cluster via un port du nœud
   selector:
     app: backend
   ports:
   - port: 5001
     targetPort: 5001
-    nodePort: 32081
+    nodePort: 32081  # port exposé à l'extérieur

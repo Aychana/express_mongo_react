@@ -1,3 +1,4 @@
+#  Secret contenant les identifiants de connexion à MongoDB
 apiVersion: v1
 kind: Secret
 metadata:
@@ -8,6 +9,7 @@ stringData:
   MONGO_INITDB_ROOT_USERNAME: root
   MONGO_INITDB_ROOT_PASSWORD: changeme
 ---
+# StatefulSet : utilisé ici car MongoDB est une base de données qui a besoin d'un stockage persistant
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -15,7 +17,7 @@ metadata:
   namespace: fil-rouge
 spec:
   serviceName: mongo
-  replicas: 1
+  replicas: 1  # une seule instance MongoDB
   selector:
     matchLabels:
       app: mongo
@@ -31,10 +33,10 @@ spec:
         - containerPort: 27017
         envFrom:
         - secretRef:
-            name: mongo-secret
+            name: mongo-secret # injection des variables d'environnement depuis le secret
         volumeMounts:
         - name: data
-          mountPath: /data/db
+          mountPath: /data/db # dossier où MongoDB stocke ses données
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -42,15 +44,16 @@ spec:
       accessModes: ["ReadWriteOnce"]
       resources:
         requests:
-          storage: 1Gi
+          storage: 1Gi  # taille du volume persistant
 ---
+#  Service interne pour exposer MongoDB aux autres pods
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo
   namespace: fil-rouge
 spec:
-  type: ClusterIP
+  type: ClusterIP  # service interne, non accessible de l'extérieur
   selector:
     app: mongo
   ports:
