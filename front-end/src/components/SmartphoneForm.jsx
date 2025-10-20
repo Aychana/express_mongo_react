@@ -85,7 +85,28 @@ const SmartphoneForm = ({ smartphone, onSubmit, onCancel }) => {
       return;
     }
 
-    onSubmit(formData);
+    const payload = {
+      ...formData,
+      prix: Number(formData.prix),
+      stock: Number(formData.stock),
+      ram: Number(formData.ram),
+      stockage: Number(formData.stockage),
+      ecran: {
+        ...formData.ecran,
+        taille: Number(formData.ecran.taille)
+      },
+      camera: {
+        principale: Number(formData.camera.principale),
+        frontale: Number(formData.camera.frontale)
+      },
+      batterie: Number(formData.batterie),
+      promotionPourcentage: Number(formData.promotionPourcentage)
+    };
+
+  console.log("📦 Payload envoyé:", payload);
+
+  onSubmit(payload);
+
   };
 
   const resetImage = () => {
