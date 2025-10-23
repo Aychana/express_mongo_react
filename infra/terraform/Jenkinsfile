@@ -1,31 +1,34 @@
-//
 pipeline {
-    agent any
+    agent any   // Exécute le pipeline sur n'importe quel agent Jenkins disponible
 
     environment {
-        AWS_DEFAULT_REGION = "us-west-2"
+        AWS_DEFAULT_REGION = "us-west-2"  // Définit la région AWS par défaut
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout') {   // Étape 1 : Récupérer le code source
             steps {
                 git branch: 'main', url: 'https://github.com/Aychana/express_mongo_react.git'
+                // Clone le repo GitHub (branche main) qui contient ton code et tes fichiers Terraform
             }
         }
 
-        stage('Terraform Init') {
+        stage('Terraform Init') {   // Étape 2 : Initialiser Terraform
             steps {
-                dir('infra/terraform') {
+                dir('infra/terraform') {   // Se place dans le dossier infra/terraform
                     withCredentials([
+                        // Injection des credentials AWS stockés dans Jenkins
                         string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
                         string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
                         string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
                     ]) {
                         sh '''
+                            # Exporte les variables d'environnement AWS
                             export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
                             export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
                             export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
 
+                            # Initialise Terraform (télécharge providers, prépare le backend)
                             terraform init
                         '''
                     }
@@ -33,7 +36,7 @@ pipeline {
             }
         }
 
-        stage('Terraform Plan') {
+        stage('Terraform Plan') {   // Étape 3 : Planifier les changements
             steps {
                 dir('infra/terraform') {
                     withCredentials([
@@ -46,6 +49,7 @@ pipeline {
                             export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
                             export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
 
+                            # Génère un plan d'exécution et le sauvegarde dans un fichier tfplan
                             terraform plan -out=tfplan
                         '''
                     }
@@ -53,7 +57,7 @@ pipeline {
             }
         }
 
-        stage('Terraform Apply') {
+        stage('Terraform Apply') {   // Étape 4 : Appliquer les changements
             steps {
                 dir('infra/terraform') {
                     withCredentials([
@@ -66,13 +70,15 @@ pipeline {
                             export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
                             export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
 
+                            # Applique le plan généré sans demander confirmation
                             terraform apply -auto-approve tfplan
                         '''
                     }
                 }
             }
         }
-        stage('Destroy') {
+
+        stage('Destroy') {   // Étape 5 : Détruire l'infrastructure
             steps {
                 dir('infra/terraform') {
                     withCredentials([
@@ -85,6 +91,7 @@ pipeline {
                             export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
                             export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
 
+                            # Détruit toutes les ressources créées par Terraform
                             terraform destroy -auto-approve
                         '''
                     }
@@ -96,7 +103,7 @@ pipeline {
     post {
         always {
             echo "Pipeline Terraform terminé ✅ (Apply + Destroy)"
+            // Message affiché à la fin du pipeline, qu'il réussisse ou échoue
         }
     }
-
 }
