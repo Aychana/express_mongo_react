@@ -1,0 +1,102 @@
+//
+pipeline {
+    agent any
+
+    environment {
+        AWS_DEFAULT_REGION = "us-west-2"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Aychana/express_mongo_react.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir('infra/terraform') {
+                    withCredentials([
+                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+                        string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+                    ]) {
+                        sh '''
+                            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                            export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+
+                            terraform init
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir('infra/terraform') {
+                    withCredentials([
+                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+                        string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+                    ]) {
+                        sh '''
+                            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                            export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+
+                            terraform plan -out=tfplan
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir('infra/terraform') {
+                    withCredentials([
+                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+                        string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+                    ]) {
+                        sh '''
+                            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                            export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+
+                            terraform apply -auto-approve tfplan
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Destroy') {
+            steps {
+                dir('infra/terraform') {
+                    withCredentials([
+                        string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                        string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+                        string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+                    ]) {
+                        sh '''
+                            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                            export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+
+                            terraform destroy -auto-approve
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline Terraform terminé ✅ (Apply + Destroy)"
+        }
+    }
+
+}
