@@ -10,7 +10,7 @@ resource "aws_security_group" "fil_rouge_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]   // Ouvert à tout le monde (⚠️ pas sécurisé en prod)
+    cidr_blocks = ["0.0.0.0/0"]   // Ouvert à tout le monde 
   }
 
   ingress {   // Règle entrante : autorise HTTP (port 80)
