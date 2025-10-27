@@ -30,7 +30,7 @@ resource "aws_security_group" "fil_rouge_sg" {
 
 resource "aws_instance" "fil_rouge_ec2" {
   ami           = "ami-0e1d35993cb249cee" // AMI Amazon Linux 2 (us-west-2)
-  instance_type = "t2.micro"              // Type d’instance autorisé dans ton sandbox
+  instance_type = "t2.micro"              
   vpc_security_group_ids = [aws_security_group.fil_rouge_sg.id] // Associe le SG
 
   tags = {
